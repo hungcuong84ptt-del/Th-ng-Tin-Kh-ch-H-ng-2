@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hồ sơ khách hàng vay</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--tx:#1b2430;--mu:#6b7785;--pr:#0f7b5f;--pr2:#e1f3ee;--bd:#dde3ea;--ok:#0f7b5f;--wn:#b7791f;--bad:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12171d;--card:#1c242d;--tx:#e8edf2;--mu:#98a4b1;--pr:#3ec59d;--pr2:#17352d;--bd:#2c3743;--ok:#3ec59d;--wn:#e0b04a;--bad:#ef7b6d}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:70px}
+header{background:var(--pr);color:#fff;padding:14px 16px;font-weight:700;font-size:18px}
+main{max-width:640px;margin:auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:12px}
+h3{margin:0 0 8px;font-size:15px;color:var(--pr)}
+label{display:block;font-size:12px;color:var(--mu);margin:8px 0 2px}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+.row{display:flex;gap:8px}.row>*{flex:1}
+button{border:0;border-radius:10px;padding:11px 14px;font:inherit;font-weight:600;background:var(--pr);color:#fff}
+button.g{background:var(--pr2);color:var(--pr)}button.d{background:transparent;color:var(--bad)}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:none;color:var(--mu);border-radius:0;padding:13px}nav button.on{color:var(--pr);box-shadow:inset 0 3px var(--pr)}
+.sb{display:flex;gap:8px;margin-bottom:12px}.sb input{flex:1}.sb button{width:48px;padding:0}
+.it{display:flex;gap:10px;align-items:center}.it .t{flex:1;min-width:0}.it b{display:block}.it small{color:var(--mu)}
+.av{width:48px;height:48px;border-radius:50%;background:var(--pr2);color:var(--pr);display:flex;align-items:center;justify-content:center;font-weight:700;object-fit:cover;flex:none;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.ev{padding:8px 10px;border-radius:10px;margin:6px 0;border-left:4px solid;background:var(--bg);font-size:14px}
+.ev.ok{border-color:var(--ok)}.ev.warn{border-color:var(--wn)}.ev.bad{border-color:var(--bad)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--bd)}.kv span:first-child{color:var(--mu)}.kv span:last-child{text-align:right}
+.empty{text-align:center;color:var(--mu);padding:30px}
+.iw{display:flex;gap:6px;align-items:flex-start}.iw>input,.iw>textarea{flex:1;min-width:0}.mc{width:42px;height:42px;padding:0;background:var(--pr2);color:var(--pr);flex:none}.wd{font-size:12.5px;color:var(--pr);font-style:italic;min-height:16px;margin-top:3px}.big{width:100%;margin-bottom:10px;text-align:left}
+html{-webkit-text-size-adjust:100%}
+body{font-size:16px;overflow-x:hidden;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+header{font-size:19px;padding:14px max(16px,env(safe-area-inset-left,0px))}
+main{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+input,select,textarea{font-size:16px;min-height:44px;-webkit-appearance:none;appearance:none;max-width:100%}
+textarea{min-height:80px;resize:vertical}
+input[type=date]{display:block;min-width:0;text-align:left}
+input[type=file]{font-size:14px;padding:8px}
+.row>*{min-width:0}
+.card,.ev,.kv span,.it .t{overflow-wrap:anywhere;word-break:break-word}
+.kv span:first-child{flex:none;white-space:nowrap}.kv span:last-child{flex:1;min-width:0}
+.it .t b{font-size:16px}.it small{font-size:13.5px}
+button{font-size:16px;line-height:1.3;white-space:normal}
+nav button{font-size:15px;padding:12px 4px}
+.mc{width:46px;height:46px}
+.wd{font-size:13.5px}
+.ev{font-size:15px}
+#rm .card{max-height:85vh;overflow-y:auto}
+</style>
+</head>
+<body>
+<header id="hd">Hồ sơ khách hàng vay</header>
+<main id="app"></main>
+<nav><button id="n1" onclick="go('find')">🔍 Tìm kiếm</button><button id="n2" onclick="go('add')">➕ Nhập</button><button id="n3" onclick="go('bk')">☁️ Sao lưu</button></nav>
+<script>
+const KEY='kh_vay_v1';let L=[];
+try{L=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){L=[]}
+function mig(c){if(!c.v){['lv','amt'].forEach(k=>{if(c[k])c[k]=String(Math.round(+c[k]*1e6))});['p1','p2'].forEach(k=>{if(c[k]&&c[k].inc)c[k].inc=String(Math.round(+c[k].inc*1e6))});c.v=2}if(c.v<3){if(c.yr)c.yr=String(Math.round(+c.yr*12));c.v=3}return c}
+L=L.map(mig);
+function save(){try{localStorage.setItem(KEY,JSON.stringify(L))}catch(e){alert('Không lưu được: bộ nhớ trình duyệt đầy hoặc bị chặn.')}}
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nd=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase();
+const fmtn=v=>String(v||'').replace(/\D/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const fm=v=>+v?fmtn(Math.round(+v))+' đ':'—';
+const fd=d=>d?d.split('-').reverse().join('/'):'—';
+/* Số tiền bằng chữ */
+const D=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
+function r3(n,full){const h=Math.floor(n/100),t=Math.floor(n%100/10),u=n%10,s=[];
+ if(h>0||full)s.push(D[h]+' trăm');
+ if(t>1){s.push(D[t]+' mươi');if(u===1)s.push('mốt');else if(u===4)s.push('tư');else if(u===5)s.push('lăm');else if(u>0)s.push(D[u])}
+ else if(t===1){s.push('mười');if(u===5)s.push('lăm');else if(u>0)s.push(D[u])}
+ else if(u>0){if(h>0||full)s.push('lẻ');s.push(D[u])}
+ return s.join(' ')}
+function wb(n,ff){const g=[];while(n>0){g.push(n%1000);n=Math.floor(n/1000)}
+ const U=['','nghìn','triệu'],o=[];
+ for(let i=g.length-1;i>=0;i--){if(!g[i])continue;o.push(r3(g[i],ff||i<g.length-1)+' '+U[i])}
+ return o.join(' ').replace(/\s+/g,' ').trim()}
+function wd(v){let n=Math.floor(+String(v||'').replace(/\D/g,''));if(!n)return'';
+ const hi=Math.floor(n/1e9),lo=n%1e9;let s=hi?wb(hi)+' tỷ'+(lo?' '+wb(lo,true):''):wb(n);
+ s=s.replace(/\s+/g,' ').trim();return s.charAt(0).toUpperCase()+s.slice(1)+' đồng'}
+function mf(el){el.value=fmtn(el.value);const w=$('#'+el.id+'_w');if(w)w.textContent=wd(el.value)}
+function pm(s){s=s.toLowerCase().replace(/đồng|vnd|đ/g,'').trim();const m=s.match(/(\d[\d.,\s]*)(tỷ|tỉ|triệu|nghìn|ngàn|k)?/);if(!m)return 0;let t=m[1].trim(),u=m[2];
+ if(u){t=t.replace(/\s/g,'');if(/^\d{1,3}(\.\d{3})+$/.test(t))t=t.replace(/\./g,'');t=parseFloat(t.replace(',','.'));if(isNaN(t))return 0;return Math.round(t*{'tỷ':1e9,'tỉ':1e9,'triệu':1e6,'nghìn':1e3,'ngàn':1e3,'k':1e3}[u])}
+ return +t.replace(/\D/g,'')||0}
+/* Giọng nói */
+function SR(){return window.SpeechRecognition||window.webkitSpeechRecognition}
+function dict(id,t){const S=SR();if(!S){alert('Trình duyệt chưa hỗ trợ giọng nói. Hãy dùng Chrome (Android) hoặc Safari (iPhone) và cho phép micro.');return}
+ const b=$('#'+id+'_m'),el=$('#'+id),r=new S();r.lang='vi-VN';r.interimResults=false;b.textContent='🔴';
+ r.onresult=e=>{const s=e.results[0][0].transcript.trim();
+  if(t==='m'){const v=pm(s);if(v){el.value=fmtn(v);mf(el)}else alert('Không nghe ra số tiền: “'+s+'”. Hãy nói kiểu “500 triệu” hoặc “1,2 tỷ”.')}
+  else if(t==='n')el.value=s.replace(/\D/g,'');
+  else el.value=(el.value?el.value+' ':'')+s.replace(/\.$/,'')};
+ r.onend=r.onerror=()=>{b.textContent='🎤'};try{r.start()}catch(x){}}
+/* Ô nhập */
+const mic=(id,t)=>`<button type="button" class="mc" id="${id}_m" onclick="dict('${id}','${t}')">🎤</button>`;
+const T=(id,l,v,t,ph,mode)=>`<label>${l}</label><div class="iw"><input id="${id}" value="${esc(v)}" placeholder="${esc(ph||'')}" ${t==='n'?`inputmode="${mode||'numeric'}"`:''}${mode==='list'?' list="rels"':''}>${mic(id,t||'t')}</div>`;
+const M=(id,l,v)=>`<label>${l} (đồng)</label><div class="iw"><input id="${id}" inputmode="numeric" value="${fmtn(v)}" oninput="mf(this)" placeholder="Ví dụ 500.000.000">${mic(id,'m')}</div><div class="wd" id="${id}_w">${wd(v)}</div>`;
+let editId=null,ph={p1:'',p2:''};
+function go(v,id){['n1','n2','n3'].forEach((n,i)=>$('#'+n).className=['find','add','bk'][i]===v?'on':'');
+ if(v==='find')findView();else if(v==='add')formView(id);else if(v==='det')detail(id);else if(v==='bk')bkView();scrollTo(0,0)}
+function person(k,title,c){c=c||{};return `<div class="card"><h3>${title}</h3>
+ <div class="row" style="align-items:center"><div class="av" id="av_${k}" style="width:64px;height:64px;flex:none">${c.photo?`<img src="${c.photo}">`:'📷'}</div>
+ <div style="flex:3"><label style="margin-top:0">Ảnh đại diện</label><input type="file" accept="image/*" onchange="pick('${k}',this)"></div></div>
+ ${T(k+'_name','Họ và tên',c.name)}${T(k+'_rel','Mối quan hệ',c.rel,'t',k==='p1'?'Chủ hồ sơ':'Vợ / chồng / con...','list')}
+ ${T(k+'_addr','Địa chỉ, số nhà',c.addr,'t','Số nhà, thôn/xóm, xã, huyện')}${T(k+'_job','Công việc',c.job)}${T(k+'_dob','Ngày sinh',c.dob,'t','dd/mm/yyyy')}<label>Tình trạng hôn nhân</label><div class="iw"><input id="${k}_mar" list="mars" value="${esc(c.mar)}">${mic(k+'_mar','t')}</div>${T(k+'_sex','Giới tính',c.sex)}${T(k+'_cdate','Ngày cấp CCCD',c.cdate,'t','dd/mm/yyyy')}${T(k+'_cplace','Nơi cấp',c.cplace)}
+ ${M(k+'_inc','Mức lương/thu nhập mỗi tháng',c.inc)}${T(k+'_tel','Số điện thoại',c.tel,'n','','tel')}${T(k+'_cccd','Số căn cước',c.cccd,'n')}</div>`}
+function formView(id){editId=id||null;const c=id?L.find(x=>x.id===id):{p1:{},p2:{}};
+ ph.p1=c.p1&&c.p1.photo||'';ph.p2=c.p2&&c.p2.photo||'';$('#hd').textContent=id?'Sửa hồ sơ':'Nhập hồ sơ mới';
+ $('#app').innerHTML=`<datalist id="rels"><option>Vợ</option><option>Chồng</option><option>Con</option><option>Bố/Mẹ</option><option>Anh/Chị/Em</option><option>Họ hàng</option><option>Bạn bè</option></datalist><datalist id="mars"><option>Độc thân</option><option>Đã lập gia đình</option><option>Ly hôn</option><option>Góa</option></datalist>
+ <div id="ai"></div>${person('p1','👤 Người đứng vay',c.p1)}${person('p2','👥 Người cùng đứng vay',c.p2)}
+ <div class="card"><h3>🏡 Tài sản đảm bảo (thửa đất)</h3>${T('land','Thông tin thửa (số thửa, tờ bản đồ, diện tích)',c.land)}
+ ${M('lv','Giá trị thực tế',c.lv)}<label>Định giá ngày</label><input id="ld" type="date" value="${esc(c.ld)}">
+ <label>Ghi chú định giá (đường, mặt tiền, pháp lý, quy hoạch...)</label><div class="iw"><textarea id="ln" rows="3">${esc(c.ln)}</textarea>${mic('ln','t')}</div></div>
+ <div class="card"><h3>💰 Mục đích vay</h3>${T('pur','Mục đích vay',c.pur,'t','Kinh doanh, chăn nuôi, sửa nhà...')}
+ ${M('amt','Số tiền vay',c.amt)}<label>Thời hạn (tháng)</label><input id="yr" type="number" inputmode="numeric" placeholder="Ví dụ 60" value="${esc(c.yr)}">
+ <label>Ghi chú thêm của cán bộ</label><div class="iw"><textarea id="note" rows="3">${esc(c.note)}</textarea>${mic('note','t')}</div></div>
+ <button style="width:100%" onclick="saveForm()">💾 Lưu hồ sơ</button>`;initAI()}
+function pick(k,inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,256/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=im.width*s;cv.height=im.height*s;cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);ph[k]=cv.toDataURL('image/jpeg',.7);$('#av_'+k).innerHTML=`<img src="${ph[k]}">`};im.src=r.result};r.readAsDataURL(f)}
+const g=i=>($('#'+i).value||'').trim(),rw=i=>g(i).replace(/\./g,'');
+function pdata(k){return{name:g(k+'_name'),rel:g(k+'_rel'),addr:g(k+'_addr'),job:g(k+'_job'),inc:rw(k+'_inc'),tel:g(k+'_tel'),cccd:g(k+'_cccd'),dob:g(k+'_dob'),mar:g(k+'_mar'),sex:g(k+'_sex'),cdate:g(k+'_cdate'),cplace:g(k+'_cplace'),photo:ph[k]}}
+function saveForm(){const o={id:editId||String(Date.now()),v:3,p1:pdata('p1'),p2:pdata('p2'),land:g('land'),lv:rw('lv'),ld:g('ld'),ln:g('ln'),pur:g('pur'),amt:rw('amt'),yr:g('yr'),note:g('note'),upd:Date.now()};
+ if(!o.p1.name){alert('Vui lòng nhập họ tên người đứng vay');return}
+ L=editId?L.map(x=>x.id===editId?o:x):[o,...L];save();go('det',o.id)}
+/* Tìm kiếm */
+function findView(){$('#hd').textContent='Hồ sơ khách hàng vay';
+ let bk=0;try{bk=+localStorage.getItem('kh_bk')||0}catch(e){}
+ const warn=L.length&&Date.now()-bk>6048e5?`<div class="ev warn" onclick="go('bk')">⚠️ ${bk?'Đã hơn 7 ngày chưa sao lưu.':'Bạn chưa sao lưu lần nào.'} Bấm để sao lưu hoặc phục hồi dữ liệu.</div>`:'';
+ $('#app').innerHTML=`${warn}<div class="sb"><input id="q" type="search" placeholder="Tên, số nhà, nghề, mục đích, CCCD, SĐT..." oninput="renderList()"><button id="mic" onclick="voice()">🎤</button></div><div id="list"></div>`;renderList()}
+function renderList(){const q=nd(($('#q')||{value:''}).value).trim();
+ const r=L.filter(c=>!q||q.split(/\s+/).every(w=>nd(JSON.stringify([c.p1,c.p2,c.land,c.pur,c.note,c.ln]).replace(/data:image[^"]*/g,'')).includes(w)));
+ $('#list').innerHTML=r.length?r.map(c=>{const e=evalC(c),w=e.filter(x=>x.lv==='bad').length,y=e.filter(x=>x.lv==='warn').length;
+ return `<div class="card it" onclick="go('det','${c.id}')"><div class="av">${c.p1.photo?`<img src="${c.p1.photo}">`:esc((c.p1.name||'?').trim().split(' ').pop()[0]||'?')}</div>
+ <div class="t"><b>${esc(c.p1.name)}${c.p2.name?' + '+esc(c.p2.name):''}</b><small>${esc(c.p1.addr)||'Chưa có địa chỉ'}<br>${esc(c.pur)||'Chưa ghi mục đích'} · ${fm(c.amt)}</small></div>
+ <div style="text-align:right;font-size:12px">${w?`<span style="color:var(--bad)">● ${w} rủi ro</span><br>`:''}${y?`<span style="color:var(--wn)">● ${y} lưu ý</span>`:(!w?'<span style="color:var(--ok)">● Ổn</span>':'')}</div></div>`}).join(''):`<div class="empty">${L.length?'Không tìm thấy hồ sơ phù hợp':'Chưa có hồ sơ nào.<br>Bấm “Nhập” để thêm khách hàng đầu tiên.<br><br><button class="g" onclick="go(\'bk\')">📥 Phục hồi dữ liệu</button>'}</div>`}
+function voice(){const S=SR();if(!S){alert('Trình duyệt chưa hỗ trợ giọng nói. Hãy dùng Chrome (Android) hoặc Safari (iPhone).');return}
+ const r=new S();r.lang='vi-VN';r.interimResults=false;$('#mic').textContent='🔴';
+ r.onresult=e=>{$('#q').value=e.results[0][0].transcript.replace(/[.,]$/,'');renderList()};
+ r.onend=r.onerror=()=>{const m=$('#mic');if(m)m.textContent='🎤'};try{r.start()}catch(e){}}
+/* Thẩm định */
+function evalC(c){const o=[],add=(lv,t)=>o.push({lv,t});
+ const inc=(+c.p1.inc||0)+(+c.p2.inc||0),amt=+c.amt||0,lv=+c.lv||0,yr=+c.yr||0;
+ if(!lv)add('bad','Chưa có giá trị thửa đất. Cần định giá trước khi đề xuất.');
+ else{if(c.ld){const m=(Date.now()-new Date(c.ld))/2.63e9;
+   if(m>12)add('bad',`Định giá đã ${Math.floor(m)} tháng, quá cũ. Cần định giá lại theo giá thị trường hiện tại.`);
+   else if(m>6)add('warn',`Định giá đã ${Math.floor(m)} tháng. Nên cập nhật lại nếu giá khu vực biến động.`);
+   else add('ok',`Định giá còn mới (ngày ${fd(c.ld)}).`)}
+  else add('warn','Chưa ghi ngày định giá. Phải ghi rõ ngày/tháng/năm để có căn cứ.');
+  if(amt){const r=amt/lv*100;
+   if(r>70)add('bad',`Số tiền vay/giá trị TSĐB = ${r.toFixed(0)}%. Cao, rủi ro khi xử lý tài sản. Nên giảm khoản vay hoặc bổ sung TSĐB.`);
+   else if(r>50)add('warn',`Vay/TSĐB = ${r.toFixed(0)}%. Chấp nhận được, cần đối chiếu tính thanh khoản của thửa đất.`);
+   else add('ok',`Vay/TSĐB = ${r.toFixed(0)}%. Biên an toàn tốt.`)}}
+ if(!c.land)add('warn','Chưa ghi thông tin thửa đất (số thửa, tờ bản đồ, diện tích, loại đất).');
+ if(!inc)add('bad','Chưa có thu nhập. Không đánh giá được khả năng trả nợ.');
+ else if(amt){const n=Math.max(1,yr||60),i=.11/12,p=amt*i/(1-Math.pow(1+i,-n)),d=p/inc*100;
+  add(d>70?'bad':d>50?'warn':'ok',`Ước tính trả gốc + lãi ~${fm(p)}/tháng (lãi giả định 11%/năm, ${n} tháng) = ${d.toFixed(0)}% thu nhập.`+(d>50?' Nên kéo dài thời hạn, giảm số vay hoặc thêm nguồn trả nợ.':''))}
+ if(inc&&!c.p1.job)add('warn','Có thu nhập nhưng chưa ghi công việc. Cần xác minh nguồn thu.');
+ const j=nd(c.p1.job+' '+c.p2.job);
+ if(/tu do|lao dong|thoi vu|buon ban|kinh doanh|nong|chan nuoi|trong/.test(j))add('warn','Thu nhập không cố định theo hợp đồng lao động. Cần xác minh thực tế (sổ sách, chợ, đại lý, sao kê), không chỉ nghe khai.');
+ else if(/cong chuc|vien chuc|giao vien|bien che|cong nhan|luong/.test(j))add('ok','Thu nhập có tính ổn định (lương). Xin xác nhận lương/sao kê 3–6 tháng.');
+ const pu=nd(c.pur);
+ if(!pu)add('bad','Chưa ghi mục đích vay.');
+ else if(/chung khoan|coin|dau co|lo de|bao nhieu cung|tra no|dao han/.test(pu))add('bad','Mục đích có dấu hiệu rủi ro cao (đầu cơ/đảo nợ). Cần kiểm tra kỹ nguồn trả nợ thực.');
+ else if(/kinh doanh|san xuat|buon ban|chan nuoi|trong|nong|von luu dong/.test(pu))add('ok','Vay sản xuất kinh doanh: cần phương án, hóa đơn, chu kỳ dòng tiền và kiểm tra thực địa.');
+ else if(/mua dat|mua nha|xay|sua nha|bat dong san/.test(pu))add('warn','Vay mua/xây/sửa nhà đất: cần hợp đồng, dự toán, giải ngân theo tiến độ, kiểm tra quy hoạch.');
+ else if(/tieu dung|mua xe|du hoc|cuoi|chua benh|y te/.test(pu))add('warn','Vay tiêu dùng: nguồn trả nợ chủ yếu từ lương. Kiểm tra nợ hiện có và tính cần thiết của khoản vay.');
+ if(c.p2.name){const r=nd(c.p2.rel);
+  if(/vo|chong/.test(r))add('ok','Vợ/chồng cùng đứng vay: đúng nguyên tắc tài sản chung, cùng ký hồ sơ và thế chấp.');
+  else if(/con|bo|me|anh|chi|em|ho hang/.test(r))add('ok','Người cùng vay là người thân. Kiểm tra họ có đồng sở hữu thửa đất và có thu nhập riêng không.');
+  else if(r)add('warn','Người cùng vay không phải người thân ruột thịt. Làm rõ lý do tham gia, nguy cơ vay hộ.');
+  else add('warn','Chưa ghi quan hệ của người cùng vay.');
+  if(!(+c.p2.inc))add('warn','Người cùng vay chưa có thu nhập, chưa tăng thêm khả năng trả nợ.')}
+ else add('warn',/da lap gia dinh|ket hon|co vo|co chong/.test(nd(c.p1.mar))?'Khách đã lập gia đình nhưng chưa có vợ/chồng cùng vay. Cần làm rõ tài sản chung và chữ ký vợ/chồng.':'Chỉ có một người vay. Nếu thửa đất là tài sản chung vợ chồng, cần vợ/chồng cùng ký.');
+ [['p1','người vay'],['p2','người cùng vay']].forEach(([k,n])=>{const p=c[k];if(k==='p2'&&!p.name)return;const m=[];
+  if(!p.cccd)m.push('CCCD');if(!p.tel)m.push('SĐT');if(!p.addr)m.push('địa chỉ');
+  if(m.length)add('warn',`Thiếu ${m.join(', ')} của ${n}.`);else if(!/^\d{12}$/.test(p.cccd))add('warn',`CCCD của ${n} chưa đủ 12 số. Kiểm tra lại.`)});
+ return o}
+function detail(id){const c=L.find(x=>x.id===id);if(!c)return go('find');$('#hd').textContent='Chi tiết hồ sơ';
+ const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b||'—'}</span></div>`,mw=v=>+v?`${fm(v)}<br><small style="color:var(--pr)">${wd(v)}</small>`:'';
+ const P=(p,t)=>!p.name&&t.includes('cùng')?'':`<div class="card"><h3>${t}</h3><div class="it" style="margin-bottom:6px"><div class="av" style="width:64px;height:64px">${p.photo?`<img src="${p.photo}">`:'👤'}</div><b style="font-size:17px">${esc(p.name)}</b></div>
+ ${kv('Quan hệ',esc(p.rel))}${kv('Địa chỉ',esc(p.addr))}${kv('Công việc',esc(p.job))}${kv('Ngày sinh',esc(p.dob))}${kv('Hôn nhân',esc(p.mar))}${kv('Giới tính',esc(p.sex))}${kv('Thu nhập/tháng',mw(p.inc))}${kv('SĐT',p.tel?`<a href="tel:${esc(p.tel)}" style="color:var(--pr)">${esc(p.tel)}</a>`:'')}${kv('CCCD',esc(p.cccd))}${kv('Cấp ngày / nơi cấp',esc([p.cdate,p.cplace].filter(Boolean).join(' · ')))}</div>`;
+ const ic={ok:'✅',warn:'⚠️',bad:'⛔'};
+ $('#app').innerHTML=`<div class="card"><h3>🧭 Nhận định của cán bộ tín dụng</h3>${evalC(c).map(x=>`<div class="ev ${x.lv}">${ic[x.lv]} ${esc(x.t)}</div>`).join('')}
+ <div class="ev" style="border-color:var(--pr)"><b>Việc nên làm khi gặp lại khách:</b><br>• Đi thực địa: kiểm tra nơi ở, nơi làm việc/kinh doanh, hỏi hàng xóm.<br>• Tra CIC, nợ xấu, nợ ngân hàng khác của cả hai người.<br>• Kiểm tra sổ đỏ: chính chủ, tranh chấp, quy hoạch, đường vào, thanh khoản.<br>• Xác minh thu nhập bằng chứng từ thực tế rồi mới tin số khách khai.</div>
+ <small style="color:var(--mu)">Gợi ý tự động để tham khảo, cần đối chiếu quy chế của đơn vị bạn.</small></div>
+ ${P(c.p1,'👤 Người đứng vay')}${P(c.p2,'👥 Người cùng đứng vay')}
+ <div class="card"><h3>🏡 Thửa đất</h3>${kv('Thông tin',esc(c.land))}${kv('Giá trị thực tế',mw(c.lv))}${kv('Định giá ngày',fd(c.ld))}${c.ln?`<p style="margin:8px 0 0">${esc(c.ln)}</p>`:''}</div>
+ <div class="card"><h3>💰 Khoản vay</h3>${kv('Mục đích',esc(c.pur))}${kv('Số tiền',mw(c.amt))}${kv('Thời hạn',c.yr?c.yr+' tháng':'')}${c.note?`<p style="margin:8px 0 0">${esc(c.note)}</p>`:''}</div>
+ <div class="row"><button class="g" onclick="go('add','${c.id}')">✏️ Sửa</button><button class="d" onclick="del('${c.id}')">🗑 Xóa</button></div>`}
+const AIP='Đây là ảnh chụp màn hình phần mềm ngân hàng chứa thông tin một khách hàng cá nhân. Trích xuất đúng những gì nhìn thấy trong ảnh, không đoán. Chỉ trả về JSON thuần với các khóa: name (tên khách hàng), addr (địa chỉ hiện tại; nếu trống dùng địa chỉ thường trú), job (nghề nghiệp), tel (số di động, chỉ chữ số), cccd (số CCCD/CMND hiện hành, chỉ chữ số), dob (ngày sinh dd/mm/yyyy), mar (tình trạng gia đình). Trường nào không thấy thì để chuỗi rỗng.';
+const AIP2=' Ảnh cũng có thể là mặt trước và/hoặc mặt sau thẻ căn cước công dân/CMND của cùng một người (có thể có nhiều ảnh, gộp thông tin từ tất cả). Thêm các khóa: sex (giới tính), cdate (ngày cấp dd/mm/yyyy), cplace (nơi cấp). Với thẻ, addr lấy nơi thường trú/nơi cư trú trên thẻ; cccd chỉ lấy dãy 12 chữ số (CMND cũ là 9 chữ số). Không đoán chữ bị mờ, để rỗng nếu không chắc.';
+function imgBlob(f){return new Promise((ok,no)=>{const r=new FileReader();r.onerror=no;r.onload=()=>{const im=new Image();im.onerror=no;im.onload=()=>{const s=Math.min(1,1600/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=im.width*s;cv.height=im.height*s;cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);cv.toBlob(b=>b?ok(b):no(),'image/jpeg',.85)};im.src=r.result};r.readAsDataURL(f)})}
+async function initAI(){let s=null;try{s=window.claude&&await claude.use('sample')}catch(e){}
+ const box=$('#ai');if(!s||!box)return;
+ box.innerHTML=`<div class="card"><h3>📷 Tự điền từ ảnh CCCD hoặc phần mềm</h3><p style="margin:0">Chọn ảnh mặt trước + mặt sau CCCD (chọn cả hai ảnh cùng lúc) hoặc ảnh màn hình phần mềm. Ứng dụng tự đọc và điền vào form.</p><label>Điền vào</label><select id="ai_t"><option value="p1">Người đứng vay</option><option value="p2">Người cùng đứng vay</option></select><label>Chọn ảnh (chọn được nhiều ảnh)</label><input type="file" accept="image/*" multiple onchange="readAI(this)"><div id="ai_s" class="wd"></div><small style="color:var(--mu)">Ảnh được gửi cho Claude để đọc chữ. Chỉ dùng khi quy chế đơn vị cho phép. Hãy kiểm tra lại thông tin trước khi lưu.</small></div>`}
+async function readAI(inp){const fs=[...inp.files];if(!fs.length)return;const st=$('#ai_s'),k=$('#ai_t').value;st.textContent='⏳ Đang đọc ảnh...';
+ try{const s=await claude.use('sample'),bs=await Promise.all(fs.map(imgBlob)),d=await s.json(AIP+AIP2,{images:bs,cache:false}),lb={name:'tên',addr:'địa chỉ',job:'nghề nghiệp',tel:'SĐT',cccd:'CCCD',dob:'ngày sinh',mar:'hôn nhân',sex:'giới tính',cdate:'ngày cấp',cplace:'nơi cấp'},ok=[];
+  for(const x in lb){let v=String(d&&d[x]||'').trim();if(x==='tel'||x==='cccd')v=v.replace(/\D/g,'');const el=$('#'+k+'_'+x);if(v&&el){el.value=v;ok.push(lb[x])}}
+  st.textContent=ok.length?'✅ Đã điền: '+ok.join(', ')+'. Kiểm tra lại rồi bấm Lưu.':'Không đọc được thông tin. Hãy chụp rõ hơn.'}
+ catch(e){st.textContent=e&&e.code==='not_granted'?'Bạn chưa cho phép dùng Claude để đọc ảnh.':'Chưa đọc được ảnh ('+(e&&e.code||'lỗi')+'). Thử lại.'}
+ inp.value=''}
+async function hp(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('kh|'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return btoa(unescape(encodeURIComponent('kh|'+s)))}}
+const gp=()=>{try{return localStorage.getItem('kh_pw')||''}catch(e){return''}};
+async function askPw(why){if(!gp())return true;const p=prompt(why+'\nNhập mật khẩu:');if(p===null)return false;if(await hp(p)===gp())return true;alert('Sai mật khẩu.');return false}
+async function setPw(){if(gp()&&!await askPw('Đổi mật khẩu.'))return;const p=prompt('Nhập mật khẩu mới (tối thiểu 4 ký tự).\nĐể trống = bỏ mật khẩu:');if(p===null)return;if(p&&p.length<4){alert('Mật khẩu quá ngắn.');return}try{if(p){localStorage.setItem('kh_pw',await hp(p));alert('Đã đặt mật khẩu.')}else{localStorage.removeItem('kh_pw');alert('Đã bỏ mật khẩu.')}}catch(e){}bkView()}
+async function del(id){if(confirm('Xóa hồ sơ này?')&&await askPw('Xóa hồ sơ khách hàng.')){L=L.filter(x=>x.id!==id);save();go('find')}}
+/* Sao lưu & phục hồi */
+const bkJson=()=>JSON.stringify({app:'kh_vay',v:2,at:new Date().toISOString(),list:L});
+const bkName=()=>'sao-luu-khach-hang-'+new Date().toISOString().slice(0,10)+'.json';
+function mark(){try{localStorage.setItem('kh_bk',Date.now())}catch(e){}}
+function bkView(){$('#hd').textContent='Sao lưu & phục hồi';let bk=0;try{bk=+localStorage.getItem('kh_bk')||0}catch(e){}
+ $('#app').innerHTML=`<div class="card"><h3>☁️ Sao lưu</h3><p style="margin:0 0 10px">Đang có <b>${L.length}</b> hồ sơ (kèm ảnh). Sao lưu gần nhất: <b>${bk?new Date(bk).toLocaleString('vi-VN'):'chưa có'}</b>.</p>
+ <button class="big" onclick="shareBk()">📤 Gửi file sao lưu qua Zalo</button>
+ <button class="big g" onclick="saveBk()">💾 Lưu file sao lưu vào máy</button>
+ <button class="big g" onclick="copyBk()">📋 Sao chép nội dung (dán vào tin nhắn Zalo)</button>
+ <small style="color:var(--mu)">Gửi qua Zalo: chọn “Cloud của tôi” để lưu cho chính mình. Nên sao lưu mỗi tuần và trước khi đổi điện thoại.</small></div>
+ <div class="card"><h3>📥 Phục hồi</h3><label style="margin-top:0">Chọn file sao lưu (.json) đã tải từ Zalo</label><input type="file" accept=".json,application/json" onchange="restoreFile(this)">
+ <label>Hoặc dán nội dung đã sao chép</label><textarea id="paste" rows="3" placeholder="Dán nội dung sao lưu vào đây"></textarea>
+ <button style="width:100%;margin-top:8px" class="g" onclick="restoreText($('#paste').value)">Phục hồi từ nội dung dán</button></div>
+ <div class="card"><h3>🔒 Mật khẩu bảo vệ</h3><p style="margin:0 0 10px">Mật khẩu: <b>${gp()?'Đã bật':'Chưa đặt'}</b>. Khi bật, phải nhập mật khẩu mới xóa được hồ sơ hoặc thay thế toàn bộ dữ liệu.</p><button class="big g" onclick="setPw()">${gp()?'Đổi / bỏ mật khẩu':'Đặt mật khẩu'}</button><small style="color:var(--mu)">Lưu ý: mật khẩu chỉ chặn việc xóa trong ứng dụng. Nếu xóa dữ liệu trang web từ cài đặt trình duyệt thì mật khẩu không chặn được, nên hãy sao lưu thường xuyên.</small></div><div id="bkmsg"></div>`}
+const msg=t=>{const m=$('#bkmsg');if(m)m.innerHTML=`<div class="ev ok">${t}</div>`};
+async function saveBk(after){try{const d=window.claude&&await claude.use('downloads');if(!d){alert('Trình duyệt này không cho lưu file trực tiếp. Hãy dùng nút “Sao chép nội dung”.');return false}
+  await d.save({filename:bkName(),data:bkJson()});mark();msg('Đã lưu file. Mở Zalo, chọn “Cloud của tôi” hoặc người nhận, bấm đính kèm file vừa lưu để gửi.');bkView2();return true}catch(e){if(!e||e.code!=='declined')alert('Chưa lưu được file ('+(e&&e.code||'lỗi')+'). Hãy thử “Sao chép nội dung”.');return false}}
+function bkView2(){}
+async function shareBk(){const f=new File([bkJson()],bkName(),{type:'application/json'});
+ if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Sao lưu hồ sơ khách hàng'});mark();msg('Đã mở danh sách chia sẻ. Chọn Zalo để gửi.');return}catch(e){if(e&&e.name==='AbortError')return}}
+ await saveBk()}
+async function copyBk(){const j=bkJson();try{await navigator.clipboard.writeText(j);mark();msg('Đã sao chép. Mở Zalo, dán vào tin nhắn (Cloud của tôi) rồi gửi. Khi phục hồi, sao chép lại tin nhắn đó và dán vào ô phục hồi.')}
+ catch(e){const t=document.createElement('textarea');t.value=j;document.body.appendChild(t);t.select();try{document.execCommand('copy');mark();msg('Đã sao chép nội dung sao lưu.')}catch(x){alert('Không sao chép được.')}t.remove()}}
+function restoreFile(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>restoreText(r.result);r.readAsText(f)}
+async function restoreText(t){let d;try{d=JSON.parse(String(t).trim())}catch(e){alert('Nội dung không đúng định dạng sao lưu.');return}
+ const a=Array.isArray(d)?d:d&&d.list;if(!Array.isArray(a)||!a.length&&!confirm('File không có hồ sơ nào. Tiếp tục?')){alert('Không tìm thấy hồ sơ trong file.');return}
+ const n=a.filter(x=>x&&x.id&&x.p1).map(mig);
+ if(confirm(`Tìm thấy ${n.length} hồ sơ.\n\nOK = GỘP vào dữ liệu hiện có (khuyên dùng, hồ sơ trùng sẽ lấy bản mới hơn).\nHủy = chọn tiếp cách khác.`)){
+  const m=new Map(L.map(x=>[x.id,x]));n.forEach(x=>{const o=m.get(x.id);if(!o||(x.upd||0)>=(o.upd||0))m.set(x.id,x)});L=[...m.values()].sort((a,b)=>(b.upd||0)-(a.upd||0));save();alert('Đã gộp. Hiện có '+L.length+' hồ sơ.');go('find')}
+ else if(confirm('Thay thế TOÀN BỘ dữ liệu hiện tại bằng '+n.length+' hồ sơ trong file? Dữ liệu hiện tại sẽ mất.')&&await askPw('Thay thế toàn bộ dữ liệu.')){L=n;save();alert('Đã phục hồi '+L.length+' hồ sơ.');go('find')}}
+function remind(){let bk=0,sn=0;try{bk=+localStorage.getItem('kh_bk')||0;sn=+localStorage.getItem('kh_sn')||0}catch(e){}
+ if(!L.length||$('#rm')||Date.now()-bk<6048e5||Date.now()-sn<864e5)return;
+ const d=document.createElement('div');d.id='rm';d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:99';
+ d.innerHTML=`<div class="card" style="max-width:380px;width:100%;margin:0"><h3>⏰ Đến hạn sao lưu</h3><p style="margin:0 0 12px">${bk?'Đã hơn 7 ngày bạn chưa sao lưu dữ liệu.':'Bạn chưa sao lưu dữ liệu lần nào.'} Đang có ${L.length} hồ sơ trong máy, mất điện thoại là mất hết.</p><button class="big" onclick="rmGo('share')">📤 Sao lưu ngay (gửi Zalo)</button><button class="big g" onclick="rmGo('bk')">📥 Phục hồi dữ liệu</button><button class="big d" onclick="rmGo('later')">Nhắc lại sau 1 ngày</button></div>`;
+ document.body.appendChild(d)}
+function rmGo(a){const d=$('#rm');if(d)d.remove();if(a==='later'){try{localStorage.setItem('kh_sn',Date.now())}catch(e){}}else if(a==='bk')go('bk');else{go('bk');shareBk()}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)remind()});
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+go('find');setTimeout(remind,600);
+</script>
+</body>
+</html>
